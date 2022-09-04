@@ -35,6 +35,7 @@ exports.createPost = (req, res, next) => {
     postText: req.body.postText,
     imageUrl: image,
     likes: 0,
+    date: Date.now(),
   });
   post.save()
     .then(() => res.status(201).json({ message: "Post créé !" }))
@@ -85,6 +86,7 @@ exports.deletePost = (req, res, next) => {
   });
 };
 
+//like d'un post .....................................................
 exports.likePost = (req, res, next) => {
   Post.findOne({ _id: req.params.id })
     .then((post) => {
