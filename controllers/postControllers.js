@@ -47,11 +47,11 @@ exports.modifyPost = (req, res, next) => {
   const postObject = req.file
     ? {
         postText: req.body.postText,
-        imageUrl: `${req.protocol}://${req.get("host")}/images/${
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${
           req.file.filename
         }`,
       }
-    : { ...req.body };
+    : { postText: req.body.postText };
   Post.updateOne({ _id: req.params.id }, { ...postObject, _id: req.params.id })
     .then(() => res.status(200).json({ message: "Post modifié !" }))
     .catch((error) => res.status(400).json({ error }));
