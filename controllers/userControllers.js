@@ -3,6 +3,13 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 exports.signup = (req, res, next) => {
+  //contrôle des validations des champs
+  if (!req.body.firstName || !req.body.lastName) {
+    res.status(400).json({
+      message: 'Merci de bien vérifier si les champs sont tous remplis !',
+    });
+    return;
+  }
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => {
@@ -20,10 +27,10 @@ exports.signup = (req, res, next) => {
             .json({ message: "Création de l'utilisateur réussie !" })
         )
         .catch((error) =>
-          res.status(400).json((error = " Erreur création utilisateur"))
+          res.status(400).json((error = ' Erreur création utilisateur'))
         );
     })
-    .catch((error) => res.status(500).json((error = " Erreur signup")));
+    .catch((error) => res.status(500).json((error = ' Erreur signup')));
 };
 
 exports.login = (req, res, next) => {

@@ -1,4 +1,6 @@
 const Post = require("../models/postModels");
+const User = require('../models/userModels');
+
 const fs = require("fs");
 
 // Récupration de touts les posts ...............................................
@@ -52,6 +54,7 @@ exports.modifyPost = (req, res, next) => {
         }`,
       }
     : { postText: req.body.postText };
+    
   Post.updateOne({ _id: req.params.id }, { ...postObject, _id: req.params.id })
     .then(() => res.status(200).json({ message: "Post modifié !" }))
     .catch((error) => res.status(400).json({ error }));
@@ -60,32 +63,63 @@ exports.modifyPost = (req, res, next) => {
 //Suppression d'un post .....................................................
 exports.deletePost = (req, res, next) => {
   Post.findOne({ _id: req.params.id }).then((post) => {
-    Post.deleteOne({ _id: req.params.id })
-      .then(() => {
-        if (post.imageUrl) {
-          const filename = post.imageUrl.split("/images/")[1];
-          const imagePath = `images/${filename}`
-          if(fs.existsSync(imagePath)) {
-            fs.unlink(imagePath, (err) => {
-              if (err) {
-                throw err;
-              }
-            });
+    //vérifier celui qui veut supprimer le post est bien l'auteur du post ou l'administrateur
+    // if (post.userId != req.auth.userId ) {
+    //   res.status(403).json({ message : 'Unauthorized request'});
+    //   } else {
+    
+      Post.deleteOne({ _id: req.params.id })
+        .then(() => {
+          if (post.imageUrl) {
+            const filename = post.imageUrl.split('/images/')[1];
+            const imagePath = `images/${filename}`;
+            if (fs.existsSync(imagePath)) {
+              fs.unlink(imagePath, (err) => {
+                if (err) {
+                  throw err;
+                }
+              });
+            }
           }
-          
-        }
-        res.status(200).json({
-          message: "Deleted!",
+          res.status(200).json({
+            message: 'Deleted!',
+          });
+        })
+        .catch((error) => {
+          res.status(400).json({
+            error: error,
+          });
         });
-      })
-      .catch((error) => {
-        res.status(400).json({
-          error: error,
-        });
-      });
-  });
-};
-
+    }
+  )}
+// exports.deletePost = (req, res, next) => {
+//   Post.findOne({ _id: req.params.id })
+//     .then((post) => {
+//       if (post.userId != req.auth.userId) {
+//         res.status(403).json({ message: 'Unauthorized request' });
+//       } else {
+//         if (post.imageUrl) {
+//           const filename = post.imageUrl.split('/images/')[1];
+//           fs.unlink(`images/${filename}`, () => {
+//             Post.deleteOne({ _id: req.params.id })
+//               .then(() => {
+//                 res.status(200).json({ message: 'Objet supprimé !' });
+//               })
+//               .catch((error) => res.status(401).json({ error }));
+//           });
+//         } else {
+//           Post.deleteOne({ _id: req.params.id })
+//             .then(() => {
+//               res.status(200).json({ message: 'Objet supprimé !' });
+//             })
+//             .catch((error) => res.status(401).json({ error }));
+//         }
+//       }
+//     })
+//     .catch((error) => {
+//       res.status(500).json({ error });
+//     });
+// };
 //like d'un post .....................................................
 exports.likePost = (req, res, next) => {
   Post.findOne({ _id: req.params.id })
