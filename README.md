@@ -130,6 +130,6 @@ A partir du répertoire source:
 ```terminal
 cd frontend
 npm install
-npm serve
+npm run serve
 ```
 L'interface front-end sera alors disponible et exécutée sur le port 8080 par défaut.
