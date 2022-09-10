@@ -1,6 +1,6 @@
 const Post = require('../models/postModels');
 const User = require('../models/userModels');
-
+const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
 // Récupration de touts les posts ...............................................
@@ -96,12 +96,12 @@ exports.modifyPost = (req, res, next) => {
 
 //Suppression d'un post .....................................................
 exports.deletePost = (req, res, next) => {
-  // console.log("params" ,req.params)
-  // console.log("body" , req.body)
+  console.log("params" ,req.params)
+  console.log("body" , req.body)
   Post.findOne({ _id: req.params.id }).then((post) => {
     //vérifier celui qui veut supprimer le post est bien l'auteur du post
     User.findOne({ _id: req.body.userId }).then((user) => {
-      // console.log('on est ici', post, user);
+      console.log('on est ici', post, user);
       if (
         post.userId.toString() !== req.body.userId ||
         user.isAdmin === 'false'
@@ -134,6 +134,32 @@ exports.deletePost = (req, res, next) => {
     });
   });
 };
+// exports.deletePost = (req, res, next) => {
+//   Post.findOne({ _id: req.params.id }).then((post) => {
+//     Post.deleteOne({ _id: req.params.id })
+//       .then(() => {
+//         if (post.imageUrl) {
+//           const filename = post.imageUrl.split('/images/')[1];
+//           const imagePath = `images/${filename}`;
+//           if (fs.existsSync(imagePath)) {
+//             fs.unlink(imagePath, (err) => {
+//               if (err) {
+//                 throw err;
+//               }
+//             });
+//           }
+//         }
+//         res.status(200).json({
+//           message: 'Deleted!',
+//         });
+//       })
+//       .catch((error) => {
+//         res.status(400).json({
+//           error: error,
+//         });
+//       });
+//   });
+// };
 
 //like d'un post .....................................................
 exports.likePost = (req, res, next) => {
